@@ -1,5 +1,5 @@
 import os
-form dataclasses import dataclass
+from dataclasses import dataclass
 
 def _req(name: str) -> str:
   v = os.environ.get(name)
