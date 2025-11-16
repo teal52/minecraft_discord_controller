@@ -21,7 +21,7 @@ def _opt_int(name: str, default: int) -> int:
   v = os.environ.get(name)
   return int(v) if (v is not None and v != "") else default
 
-@dataclass(frozen=true)
+@dataclass(frozen=True)
 class Settings:
   DISCORD_TOKEN: str = os.environ.get("IDSCORDTOKEN", "")
   GUILD_ID: str | None = _opt("GUILD_ID")
