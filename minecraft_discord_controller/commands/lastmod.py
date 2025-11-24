@@ -1,0 +1,12 @@
+import discord
+from discord import app_commands
+from minecraft_discord_controller.commands.uploadmod import get_last_uploaded
+from minecraft_discord_controller.utils.permissions import ensure_allowed
+
+def register(tree: app_commands.CommandTree):
+    @tree.command(name="lastmod", description="最後にアップロードしたmodファイル名を表示します")
+    async def lastmod(inter: discord.Interaction):
+        if not await ensure_allowed(inter):
+            return
+        name = get_last_uploaded(inter.guild_id)
+        await inter.response.send_message(name or "（記録なし）", ephemeral=True)
