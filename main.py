@@ -13,6 +13,12 @@ intents = discord.Intents.default()
 bot = commands.Bot(command_prefix="!", intents=intents)
 
 @bot.event
+# @fn on_ready
+# @brief Bot の起動完了イベント
+# @details register_all_commands を実行して tree を同期し、ログへ bot ユーザー情報を出力します
+# @return なし
+async def on_ready():
+    await register_all_commands(bot, settings)  # Bot起動時にすべてのスラッシュコマンドを登録
 async def on_ready():
     await register_all_commands(bot, settings)
     log.info(f"Logged in as {bot.user}")

@@ -12,19 +12,25 @@ from .lastmod import register as register_lastmod
 
 log = logging.getLogger(__name__)
 
+# @fn register_all_commands
+# @brief すべてのスラッシュコマンドを登録する
+# @details 各コマンドモジュールの register を呼び出し CommandTree にバインドし、ギルド指定の有無で tree.sync を切り替えます
+# @param bot コマンド登録対象の Discord Bot インスタンス
+# @param settings 設定値を保持する Settings オブジェクト
+# @return なし
 async def register_all_commands(bot: commands.Bot, settings: Settings):
     tree: app_commands.CommandTree = bot.tree
-    register_status(tree)
-    register_uploadmod(tree)
-    register_restart(tree)
-    register_lastmod(tree)
+    register_status(tree)  # ステータスコマンドを登録
+    register_uploadmod(tree)  # モッドアップロードコマンドを登録
+    register_restart(tree)  # 再起動コマンドを登録
+    register_lastmod(tree)  # 最後のモッド表示コマンドを登録
     try:
         if settings.GUILD_ID:
             guild = discord.Object(id=int(settings.GUILD_ID))
-            await tree.sync(guild=guild)
+            await tree.sync(guild=guild)  # ギルド限定でコマンドを同期
             log.info("Slash commands synced (guild).")
         else:
-            await tree.sync()
+            await tree.sync()  # グローバルでコマンドを同期
             log.info("Slash commands synced (global).")
     except Exception as e:
         log.error(f"Slash command sync failed: {e}")
