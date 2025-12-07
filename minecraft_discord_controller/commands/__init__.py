@@ -12,6 +12,12 @@ from .lastmod import register as register_lastmod
 
 log = logging.getLogger(__name__)
 
+# @fn register_all_commands
+# @brief すべてのスラッシュコマンドを登録する
+# @details 各コマンドモジュールの register を呼び出し CommandTree にバインドし、ギルド指定の有無で tree.sync を切り替えます
+# @param bot コマンド登録対象の Discord Bot インスタンス
+# @param settings 設定値を保持する Settings オブジェクト
+# @return なし
 async def register_all_commands(bot: commands.Bot, settings: Settings):
     tree: app_commands.CommandTree = bot.tree
     register_status(tree)  # ステータスコマンドを登録

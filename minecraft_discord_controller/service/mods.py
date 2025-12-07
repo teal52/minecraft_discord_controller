@@ -3,6 +3,11 @@ import zipfile
 import tomli
 from typing import Optional, Tuple
 
+# @fn extract_mod_metadata
+# @brief モッドの表示名とバージョンを抽出する
+# @details zipfile で jar を開き、Forge は mods.toml、Fabric は fabric.mod.json をパースして先頭エントリの name/id と version を拾います
+# @param local_jar 解析するローカルの jar ファイルパス
+# @return (表示名, バージョン) のタプル。取得できない場合は (None, None)
 def extract_mod_metadata(local_jar: str) -> Tuple[Optional[str], Optional[str]]:
     try:
         with zipfile.ZipFile(local_jar, "r") as z:

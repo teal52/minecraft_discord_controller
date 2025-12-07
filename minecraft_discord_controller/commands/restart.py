@@ -9,7 +9,18 @@ from minecraft_discord_controller.service.minecraft import (
 )
 from minecraft_discord_controller.commands.uploadmod import get_last_uploaded
 
+# @fn register
+# @brief /restart コマンドをツリーへ登録する
+# @details CommandTree に restart スラッシュコマンドを追加し、watch オプション付きのハンドラーをセットアップします
+# @param tree コマンド登録先の CommandTree
+# @return なし
 def register(tree: app_commands.CommandTree):
+    # @fn restart
+    # @brief サーバーを再起動し、起動を監視する
+    # @details 権限チェック後に RESTART_METHOD に応じて RCON か systemd を実行し、tail_log_until でヒントに基づいてログを監視します
+    # @param inter コマンドを実行した Interaction
+    # @param watch 直近のアップロード jar を監視ヒントに使うかどうか
+    # @return なし
     @tree.command(name="restart", description="サーバーを再起動し、mod読み込みを監視します")
     @app_commands.describe(watch="直近のアップロードjarを監視ヒントに使う(推奨)(default: True)")
     async def restart(inter: discord.Interaction, watch: bool = True):

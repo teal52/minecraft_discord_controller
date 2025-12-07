@@ -10,6 +10,13 @@ from mcrcon import MCRcon
 from mcstatus import JavaServer
 from minecraft_discord_controller.config import settings
 
+# @fn local_copy_to_mods
+# @brief ローカルファイルを mods ディレクトリにコピーする
+# @details os.makedirs で設置先を作成し、shutil.copy2 でメタデータごと複製して配置パスを返します
+# @param local_path コピー元のローカルファイルパス
+# @param remote_dir コピー先ディレクトリパス
+# @param remote_filename コピー先のファイル名
+# @return コピー先のファイルパス
 def local_copy_to_mods(local_path: str, remote_dir: str, remote_filename: str) -> str:
     os.makedirs(remote_dir, exist_ok=True)  # ディレクトリが存在しない場合は作成
     dst = os.path.join(remote_dir, remote_filename)
@@ -18,7 +25,7 @@ def local_copy_to_mods(local_path: str, remote_dir: str, remote_filename: str) -
 
 # @fn tail_log_until
 # @brief ログファイルを監視して特定のパターンが出現するまで待機する
-# @details ログファイルをリアルタイムで監視し、JARファイル名の読み込みまたはサーバー起動完了メッセージを検知します
+# @details subprocess で tail -F を起動し、正規表現で JAR 名または Done パターンをチェックしつつタイムアウトまで非同期で読み続けます
 # @param filename_hint 検索するファイル名のヒント、または"Done"（サーバー起動完了を検知）
 # @param timeout タイムアウト時間（秒）
 # @return パターンが見つかった場合はTrue、タイムアウトした場合はFalse
@@ -65,10 +72,20 @@ async def tail_log_until(filename_hint: str, timeout: int) -> bool:
             if proc.returncode is None:
                 proc.terminate()  # プロセスを確実に終了させる
 
+# @fn rcon_command
+# @brief RCON でコマンドを実行する
+# @details MCRcon コンテキストを開き、指定コマンドを送信して得たレスポンス文字列を返します
+# @param cmd 実行する RCON コマンド
+# @return コマンド実行結果のレスポンス文字列（空の場合は空文字）
 def rcon_command(cmd: str) -> str:
     with MCRcon(settings.RCON_HOST, settings.RCON_PASSWORD, port=settings.RCON_PORT) as mcr:  # RCON接続を確立
         return mcr.command(cmd) or ""  # コマンドを実行してレスポンスを取得
 
+# @fn restart_via_rcon
+# @brief RCON 経由でサーバーを再起動する
+# @details カウントダウン中に say を逐次送信し、最後に stop を発行するシーケンスを同期実行します
+# @param countdown 再起動までの秒数
+# @return なし
 def restart_via_rcon(countdown: int):
     try:
         rcon_command(f"say Server restarting in {countdown} seconds...")  # 再起動開始のメッセージ
@@ -84,6 +101,10 @@ def restart_via_rcon(countdown: int):
     rcon_command("say Stopping now...")
     rcon_command("stop")  # サーバーを停止
 
+# @fn restart_via_local_systemd
+# @brief systemd を通じてサーバーを再起動する
+# @details subprocess.run で systemctl restart を呼び出し、非ゼロ終了時は stderr を含む RuntimeError を投げます
+# @return なし
 def restart_via_local_systemd():
     rc = subprocess.run(
         ["systemctl", "restart", settings.SYSTEMD_UNIT],  # systemd経由でサーバーを再起動
@@ -92,6 +113,12 @@ def restart_via_local_systemd():
     if rc.returncode != 0:
         raise RuntimeError(rc.stderr.strip())  # コマンド失敗時はエラーを投げる
 
+# @fn query_status
+# @brief サーバーのステータスを問い合わせる
+# @details JavaServer.lookup で対象に接続し status() のレスポンスから人数とバージョンを組み立て、例外時はオフライン表記を返します
+# @param host_for_query 接続先ホスト（未指定時は設定値を使用）
+# @param port 接続ポート
+# @return ステータス文字列（オンライン情報、またはオフラインメッセージ）
 def query_status(host_for_query: Optional[str] = None, port: int = 25565) -> str:
     host = host_for_query or settings.RCON_HOST
     try:
