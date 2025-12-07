@@ -19,6 +19,8 @@ bot = commands.Bot(command_prefix="!", intents=intents)
 # @return なし
 async def on_ready():
     await register_all_commands(bot, settings)  # Bot起動時にすべてのスラッシュコマンドを登録
+async def on_ready():
+    await register_all_commands(bot, settings)
     log.info(f"Logged in as {bot.user}")
 
 if __name__ == "__main__":
