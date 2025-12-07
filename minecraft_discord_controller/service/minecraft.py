@@ -16,6 +16,12 @@ def local_copy_to_mods(local_path: str, remote_dir: str, remote_filename: str) -
     shutil.copy2(local_path, dst)  # ファイルをコピー（メタデータも保持）
     return dst
 
+# @fn tail_log_until
+# @brief ログファイルを監視して特定のパターンが出現するまで待機する
+# @details ログファイルをリアルタイムで監視し、JARファイル名の読み込みまたはサーバー起動完了メッセージを検知します
+# @param filename_hint 検索するファイル名のヒント、または"Done"（サーバー起動完了を検知）
+# @param timeout タイムアウト時間（秒）
+# @return パターンが見つかった場合はTrue、タイムアウトした場合はFalse
 async def tail_log_until(filename_hint: str, timeout: int) -> bool:
     proc = await asyncio.create_subprocess_exec(
         "tail", "-n", "0", "-F", settings.MC_LOG_PATH,  # ログファイルをリアルタイムで監視
