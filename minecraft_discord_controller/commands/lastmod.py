@@ -8,5 +8,5 @@ def register(tree: app_commands.CommandTree):
     async def lastmod(inter: discord.Interaction):
         if not await ensure_allowed(inter):
             return
-        name = get_last_uploaded(inter.guild_id)
-        await inter.response.send_message(name or "（記録なし）", ephemeral=True)
+        name = get_last_uploaded(inter.guild_id)  # 最後にアップロードしたJARファイル名を取得
+        await inter.response.send_message(name or "（記録なし）", ephemeral=True)  # 記録がない場合は「記録なし」を表示

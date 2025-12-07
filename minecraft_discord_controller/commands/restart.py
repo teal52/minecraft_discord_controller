@@ -15,20 +15,20 @@ def register(tree: app_commands.CommandTree):
     async def restart(inter: discord.Interaction, watch: bool = True):
         if not await ensure_allowed(inter):
             return
-        await inter.response.defer(thinking=True)
+        await inter.response.defer(thinking=True)  # 処理に時間がかかることを通知
 
-        filename_hint = get_last_uploaded(inter.guild_id) if watch else None
+        filename_hint = get_last_uploaded(inter.guild_id) if watch else None  # 監視対象のJARファイル名を取得
 
         try:
             if settings.RESTART_METHOD == "LOCAL_SYSTEMD":
-                restart_via_local_systemd()
+                restart_via_local_systemd()  # systemd経由で再起動
             else:
                 await inter.followup.send(
                     f"再起動を開始します（{settings.RESTART_COUNTDOWN_SECONDS}s後にstop）。",
                     ephemeral=True
                 )
                 loop = asyncio.get_running_loop()
-                await loop.run_in_executor(None, lambda: restart_via_rcon(settings.RESTART_COUNTDOWN_SECONDS))
+                await loop.run_in_executor(None, lambda: restart_via_rcon(settings.RESTART_COUNTDOWN_SECONDS))  # RCON経由で再起動（別スレッドで実行）
         except Exception as e:
             await inter.followup.send(f"再起動に失敗: {e}", ephemeral=True)
             return
@@ -38,8 +38,8 @@ def register(tree: app_commands.CommandTree):
             ephemeral=True
         )
 
-        hint = filename_hint or "Done"
-        loaded = await tail_log_until(hint, settings.STARTUP_TIMEOUT_SECONDS)
+        hint = filename_hint or "Done"  # ヒントがない場合は"Done"を監視
+        loaded = await tail_log_until(hint, settings.STARTUP_TIMEOUT_SECONDS)  # ログを監視して起動・モッド読み込みを検知
 
         ch: discord.abc.MessageableChannel = inter.channel
         if loaded:

@@ -8,6 +8,6 @@ def register(tree: app_commands.CommandTree):
     async def status(inter: discord.Interaction):
         if not await ensure_allowed(inter):
             return
-        await inter.response.defer(thinking=True, ephemeral=True)
-        msg = query_status()
-        await inter.followup.send(msg, ephemeral=True)
+        await inter.response.defer(thinking=True, ephemeral=True)  # 処理中であることを通知（他人には見えない）
+        msg = query_status()  # サーバーのステータス情報を取得
+        await inter.followup.send(msg, ephemeral=True)  # ステータス情報を送信（他人には見えない）
