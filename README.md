@@ -9,45 +9,6 @@ DiscordからMinecraftサーバーを管理するためのBotです。modのア�
 - サーバーステータスの確認
 - 最後にアップロードしたmodの確認
 
-## セットアップ
-
-### 1. 依存関係のインストール
-
-```bash
-pip install -r requirements.txt
-```
-
-### 2. 環境変数の設定
-
-`secrets.sh`ファイルに以下の環境変数を設定してください：
-
-**必須環境変数:**
-- `DISCORD_TOKEN`: Discord Botのトークン
-- `RCON_HOST`: RCON接続のホスト名（例: `localhost`）
-- `RCON_PORT`: RCON接続のポート番号（例: `25575`）
-- `RCON_PASSWORD`: RCONのパスワード
-- `MC_DIR`: Minecraftサーバーのディレクトリパス
-- `MC_LOG_PATH`: Minecraftサーバーのログファイルのパス
-- `MC_MODS_DIR`: modsディレクトリのパス
-- `RESTART_METHOD`: 再起動方法（`RCON` または `LOCAL_SYSTEMD`）
-- `SYSTEMD_UNIT`: systemdユニット名（RESTART_METHODが`LOCAL_SYSTEMD`の場合）
-
-**オプション環境変数:**
-- `GUILD_ID`: 特定のギルドでのみコマンドを使用可能にする場合のギルドID
-- `ALLOWED_ROLE_ID`: コマンド実行を許可するロールID（設定しない場合、全員が使用可能）
-- `RESTART_COUNTDOWN_SECONDS`: 再起動前のカウントダウン時間（デフォルト: `10`秒）
-- `STARTUP_TIMEOUT_SECONDS`: 起動監視のタイムアウト時間（デフォルト: `240`秒）
-
-### 3. Botの起動
-
-```bash
-# 前面実行
-./run.sh fg
-
-# バックグラウンド実行
-./run.sh bg
-```
-
 ## コマンド一覧
 
 ### `/uploadmod`
